@@ -44,6 +44,8 @@ module JSONTranslate
 
           if MYSQL_ADAPTERS.include?(connection.adapter_name)
             where("JSON_CONTAINS(#{quoted_translation_store}, :translation, '$')", translation: translation_hash.to_json)
+          elsif connection.adapter_name == 'PostgreSQL'
+            where("#{quoted_translation_store}->>:locale = :value", locale: locale.to_s, value: value)
           else
             where("#{quoted_translation_store} @> :translation::jsonb", translation: translation_hash.to_json)
           end
